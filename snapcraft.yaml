@@ -12,6 +12,8 @@ parts:
     prebuilt:
         plugin: dump
         source: prebuilt
+        organize:
+            '*': rescue/
 
     u-boot-sd:
         plugin: uboot
@@ -55,8 +57,9 @@ parts:
         install: |
             skales/dtbTool -o u-boot-dt.img -s 2048 arch/arm/dts/
             touch u-boot-ramdisk.img
+            mkdir -p $SNAPCRAFT_PART_INSTALL/rescue
             skales/mkbootimg --kernel=u-boot.bin \
-                             --output=$SNAPCRAFT_PART_INSTALL/emmc_u-boot.img \
+                             --output=$SNAPCRAFT_PART_INSTALL/rescue/emmc_u-boot.img \
                              --dt=u-boot-dt.img \
                              --pagesize 2048 \
                              --base 0x80000000 \
@@ -73,6 +76,10 @@ parts:
         stage:
             - -MD5SUMS.txt
             - -NON-HLOS.bin
+        organize:
+            tz.mbn: rescue/tz.mbn
+            rpm.mbn: rescue/rpm.mbn
+            hyp.mbn: rescue/hyp.mbn
 
     emmc-build-blobs:
         plugin: dump
@@ -89,3 +96,6 @@ parts:
             - -rpm.mbn
             - -tz.mbn
             - -hyp.mbn
+        organize:
+            emmc_sbl1.mbn: rescue/emmc_sbl1.mbn
+            emmc_appsboot.mbn: rescue/emmc_appsboot.mbn
